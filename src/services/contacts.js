@@ -1,11 +1,23 @@
 import { ContactCollection } from '../db/models/contact.js';
 
-export const getAllContacts = async () => {
-  const contacts = await ContactCollection.find();
-  return contacts;
-};
+const getAllContactsFromDB = () => ContactCollection.find();
 
-export const getContactById = async (contactId) => {
-  const contact = await ContactCollection.findById(contactId);
-  return contact;
+const getContactByIdFromDB = (contactId) =>
+  ContactCollection.findById(contactId);
+
+const createContactInDB = (contactData) =>
+  ContactCollection.create(contactData);
+
+const deleteContactFromDB = (contactId) =>
+  ContactCollection.findByIdAndDelete(contactId);
+
+const patchContactInDB = (contactId, contactData) =>
+  ContactCollection.findByIdAndUpdate(contactId, contactData, { new: true });
+
+export {
+  getAllContactsFromDB,
+  getContactByIdFromDB,
+  createContactInDB,
+  deleteContactFromDB,
+  patchContactInDB,
 };
