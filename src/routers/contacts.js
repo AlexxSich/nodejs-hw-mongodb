@@ -8,6 +8,11 @@ import {
   patchContact,
 } from '../controllers/contacts.js';
 
+import { contactSchema, updateContactSchema } from '../validations/contacts.js';
+import { validateBody } from '../middleware/validateBody.js';
+
+import { isValidId } from '../middleware/isValidId.js';
+
 const contactsRouter = express.Router();
 const jsonParser = express.json();
 
@@ -17,15 +22,22 @@ contactsRouter.get('/', (req, res) => {
 
 contactsRouter.get('/contacts', ctrlWrapper(getAllContacts));
 
-contactsRouter.get('/contacts/:contactId', ctrlWrapper(getContactById));
+contactsRouter.get('/contacts/:id', isValidId, ctrlWrapper(getContactById));
 
-contactsRouter.post('/contacts', jsonParser, ctrlWrapper(createContact));
+contactsRouter.post(
+  '/contacts',
+  jsonParser,
+  validateBody(contactSchema),
+  ctrlWrapper(createContact),
+);
 
-contactsRouter.delete('/contacts/:contactId', ctrlWrapper(deleteContact));
+contactsRouter.delete('/contacts/:id', isValidId, ctrlWrapper(deleteContact));
 
 contactsRouter.patch(
-  '/contacts/:contactId',
+  '/contacts/:id',
+  isValidId,
   jsonParser,
+  validateBody(updateContactSchema),
   ctrlWrapper(patchContact),
 );
 

@@ -1,6 +1,46 @@
 import { ContactCollection } from '../db/models/contact.js';
 
-const getAllContactsFromDB = () => ContactCollection.find();
+async function getAllContactsFromDB({
+  page,
+  perPage,
+  sortBy,
+  sortOrder,
+  filter,
+}) {
+  const limit = perPage;
+  const skip = page > 0 ? (page - 1) * perPage : 0;
+
+  const contactQuery = ContactCollection.find();
+
+  if (filter.contactType) {
+    contactQuery.where('contactType').equals(filter.contactType);
+  }
+
+  if (filter.isFavourite) {
+    contactQuery.where('isFavourite').equals(filter.isFavourite);
+  }
+
+  const [contacts, countedContacts] = await Promise.all([
+    contactQuery
+      .sort({ [sortBy]: sortOrder })
+      .skip(skip)
+      .limit(limit)
+      .exec(),
+    ContactCollection.find().merge(contactQuery).countDocuments(),
+  ]);
+
+  const totalPages = Math.ceil(countedContacts / perPage);
+
+  return {
+    data: contacts,
+    page,
+    perPage,
+    totalItems: countedContacts,
+    totalPages,
+    hasNextPage: totalPages > page,
+    hasPreviousPage: page > 1,
+  };
+}
 
 const getContactByIdFromDB = (contactId) =>
   ContactCollection.findById(contactId);
