@@ -11,6 +11,9 @@ async function getAllContactsFromDB({
   const skip = page > 0 ? (page - 1) * perPage : 0;
 
   const contactQuery = ContactCollection.find();
+  const count = await ContactCollection.find()
+    .merge(contactQuery)
+    .countDocuments();
 
   if (filter.contactType) {
     contactQuery.where('contactType').equals(filter.contactType);
@@ -20,22 +23,23 @@ async function getAllContactsFromDB({
     contactQuery.where('isFavourite').equals(filter.isFavourite);
   }
 
-  const [contacts, countedContacts] = await Promise.all([
+  const [contacts] = await Promise.all([
     contactQuery
       .sort({ [sortBy]: sortOrder })
       .skip(skip)
       .limit(limit)
       .exec(),
-    ContactCollection.find().merge(contactQuery).countDocuments(),
   ]);
 
-  const totalPages = Math.ceil(countedContacts / perPage);
+  console.log(count);
+
+  const totalPages = Math.ceil(count / perPage);
 
   return {
     data: contacts,
     page,
     perPage,
-    totalItems: countedContacts,
+    totalItems: count,
     totalPages,
     hasNextPage: totalPages > page,
     hasPreviousPage: page > 1,

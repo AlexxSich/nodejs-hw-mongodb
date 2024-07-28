@@ -19,7 +19,9 @@ export async function getAllContacts(req, res, next) {
   });
 
   if (contacts.data.length === 0) {
-    return next(createHttpError(404, 'Page not found'));
+    return next(
+      createHttpError(404, 'Page not found. Try to change your request'),
+    );
   }
 
   res.json({
