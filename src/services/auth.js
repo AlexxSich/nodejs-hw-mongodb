@@ -24,7 +24,7 @@ async function loginUser(email, password) {
   const isPassMatch = await bcrypt.compare(password, maybeUser.password);
 
   if (isPassMatch === false) {
-    throw createHttpError(401, 'Unauthorized');
+    throw createHttpError(401, 'Unauthorize');
   }
 }
 
