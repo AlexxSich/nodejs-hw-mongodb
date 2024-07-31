@@ -6,6 +6,8 @@ import contactsRouter from './routers/contacts.js';
 import { notFoundHandler } from './middleware/notFoundHandler.js';
 import { errorHandler } from './middleware/errorHandler.js';
 
+import registerRouter from './routers/auth.js';
+
 const PORT = Number(env('PORT', '3000'));
 
 export const setupServer = () => {
@@ -20,6 +22,7 @@ export const setupServer = () => {
     }),
   );
 
+  app.use(registerRouter);
   app.use(contactsRouter);
 
   app.use('*', notFoundHandler);
