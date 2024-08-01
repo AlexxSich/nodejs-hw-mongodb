@@ -13,8 +13,12 @@ import { validateBody } from '../middleware/validateBody.js';
 
 import { isValidId } from '../middleware/isValidId.js';
 
+import { authenticate } from '../middleware/authenticate.js';
+
 const contactsRouter = express.Router();
 const jsonParser = express.json();
+
+contactsRouter.use(authenticate);
 
 contactsRouter.get('/', (req, res) => {
   res.json('Вітаємо вас на сторінці контактів');
