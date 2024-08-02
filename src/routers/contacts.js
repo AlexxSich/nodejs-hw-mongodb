@@ -18,11 +18,11 @@ import { authenticate } from '../middleware/authenticate.js';
 const contactsRouter = express.Router();
 const jsonParser = express.json();
 
-contactsRouter.use(authenticate);
-
 contactsRouter.get('/', (req, res) => {
   res.json('Вітаємо вас на сторінці контактів');
 });
+
+contactsRouter.use(authenticate);
 
 contactsRouter.get('/contacts', ctrlWrapper(getAllContacts));
 
