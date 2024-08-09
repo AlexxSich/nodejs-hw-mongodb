@@ -4,6 +4,10 @@ import { parsePaginationParams } from '../utils/parsePaginationParams.js';
 import { parseSortParams } from '../utils/parseSortParams.js';
 import { parseFilterParams } from '../utils/parseFilterParams.js';
 
+import { saveFileToUploadDir } from '../utils/saveFileToUploadDir.js';
+import { saveFileToCloudinary } from '../utils/saveFileToCloudinary.js';
+import { env } from '../utils/env.js';
+
 export async function getAllContacts(req, res, next) {
   const { page, perPage } = parsePaginationParams(req.query);
   const { sortBy, sortOrder } = parseSortParams(req.query);
@@ -47,6 +51,13 @@ export async function getContactById(req, res, next) {
 }
 
 export async function createContact(req, res, next) {
+  const photo = req.file;
+
+  let photoUrl;
+  if (photo) {
+    photoUrl = await saveFileToUploadDir(photo);
+  }
+
   const contactData = {
     name: req.body.name,
     phoneNumber: req.body.phoneNumber,
@@ -54,6 +65,7 @@ export async function createContact(req, res, next) {
     isFavourite: req.body.isFavourite,
     contactType: req.body.contactType,
     userId: req.user._id,
+    photo: photoUrl,
   };
 
   const newContact = await contactsServices.createContactInDB(contactData);
@@ -79,11 +91,19 @@ export async function deleteContact(req, res, next) {
 
 export async function patchContact(req, res, next) {
   const { id } = req.params;
+  const photo = req.file;
+
+  let photoUrl;
+  if (env('ENABLE_CLOUDINARY') === 'true') {
+    photoUrl = await saveFileToCloudinary(photo);
+  } else {
+    photoUrl = await saveFileToUploadDir(photo);
+  }
 
   const contactData = await contactsServices.patchContactInDB(
     id,
     req.user._id,
-    req.body,
+    { ...req.body, photo: photoUrl },
   );
 
   if (!contactData) {
