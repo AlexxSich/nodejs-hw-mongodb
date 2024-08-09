@@ -3,8 +3,13 @@ import {
   loginUser,
   logoutUser,
   refreshUserSession,
+  resetPassword,
 } from '../services/auth.js';
 import { ONE_MONTH } from '../constants/index.js';
+import createHttpError from 'http-errors';
+import { isHttpError } from 'http-errors';
+
+import { requestResetToken } from '../services/auth.js';
 
 async function registerUserController(req, res) {
   const user = {
@@ -23,13 +28,6 @@ async function registerUserController(req, res) {
 }
 
 async function loginController(req, res) {
-  // const { email, password } = req.body;
-  // await loginUser(email, password);
-
-  // res.send('Login Completed');
-
-  // ==================================
-
   const session = await loginUser(req.body);
   res.cookie('refreshToken', session.refreshToken, {
     httpOnly: true,
@@ -73,7 +71,7 @@ const setupSession = (res, session) => {
   });
 };
 
-export const refreshUserSessionController = async (req, res) => {
+const refreshUserSessionController = async (req, res) => {
   const session = await refreshUserSession({
     sessionId: req.cookies.sessionId,
     refreshToken: req.cookies.refreshToken,
@@ -89,6 +87,48 @@ export const refreshUserSessionController = async (req, res) => {
     },
   });
 };
+
 // =================================
 
-export { registerUserController, loginController, logoutUserController };
+const requestResetEmailController = async (req, res) => {
+  try {
+    await requestResetToken(req.body.email);
+    res.json({
+      message: 'Reset password email was successfully sent',
+      status: 200,
+      data: {},
+    });
+  } catch (error) {
+    if (isHttpError(error) === true) {
+      res
+        .status(error.status)
+        .send({ status: error.status, message: error.message });
+    } else {
+      throw createHttpError(
+        500,
+        'Failed to send the email, please try again later.',
+      );
+    }
+  }
+};
+
+async function resetPasswordController(req, res, next) {
+  await resetPassword(req.body);
+
+  res.json({
+    message: 'Password was successfully reset!',
+    status: 200,
+    data: {},
+  });
+}
+
+// ==================================
+
+export {
+  registerUserController,
+  loginController,
+  logoutUserController,
+  refreshUserSessionController,
+  requestResetEmailController,
+  resetPasswordController,
+};
