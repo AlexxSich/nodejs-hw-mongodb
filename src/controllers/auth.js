@@ -8,8 +8,10 @@ import {
 import { ONE_MONTH } from '../constants/index.js';
 import createHttpError from 'http-errors';
 import { isHttpError } from 'http-errors';
-
 import { requestResetToken } from '../services/auth.js';
+
+import { generateAuthUrl } from '../utils/googleOAuth2.js';
+import { loginOrSignupWithGoogle } from '../services/auth.js';
 
 async function registerUserController(req, res) {
   const user = {
@@ -88,8 +90,6 @@ const refreshUserSessionController = async (req, res) => {
   });
 };
 
-// =================================
-
 const requestResetEmailController = async (req, res) => {
   try {
     await requestResetToken(req.body.email);
@@ -123,6 +123,32 @@ async function resetPasswordController(req, res, next) {
 }
 
 // ==================================
+
+export const getGoogleOAuthUrlController = async (req, res) => {
+  const url = generateAuthUrl();
+  res.json({
+    status: 200,
+    message: 'Successfully get Google OAuth url!',
+    data: {
+      url,
+    },
+  });
+};
+
+export const loginWithGoogleController = async (req, res) => {
+  const session = await loginOrSignupWithGoogle(req.body.code);
+  setupSession(res, session);
+
+  res.json({
+    status: 200,
+    message: 'Successfully logged in via Google OAuth!',
+    data: {
+      accessToken: session.accessToken,
+    },
+  });
+};
+
+// =================================
 
 export {
   registerUserController,

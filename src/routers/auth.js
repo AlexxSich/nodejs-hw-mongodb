@@ -8,6 +8,7 @@ import {
   refreshUserSessionController,
   requestResetEmailController,
   resetPasswordController,
+  loginWithGoogleController,
 } from '../controllers/auth.js';
 
 import { validateBody } from '../middleware/validateBody.js';
@@ -17,7 +18,10 @@ import {
   loginSchema,
   requestResetEmailSchema,
   resetPasswordSchema,
+  loginWithGoogleOAuthSchema,
 } from '../validations/auth.js';
+
+import { getGoogleOAuthUrlController } from '../controllers/auth.js';
 
 const registerRouter = express.Router();
 const jsonParser = express.json();
@@ -51,6 +55,17 @@ registerRouter.post(
   jsonParser,
   validateBody(resetPasswordSchema),
   ctrlWrapper(resetPasswordController),
+);
+
+registerRouter.get(
+  '/auth/get-oauth-url',
+  ctrlWrapper(getGoogleOAuthUrlController),
+);
+registerRouter.post(
+  '/auth/confirm-oauth',
+  jsonParser,
+  validateBody(loginWithGoogleOAuthSchema),
+  ctrlWrapper(loginWithGoogleController),
 );
 
 export default registerRouter;
