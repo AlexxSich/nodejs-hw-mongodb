@@ -40,10 +40,6 @@ requestBody:
             type: string
             enum: ['work', 'home', 'personal']
             default: personal
-          userId:
-            description: "Contact's user id"
-            type: string
-            example: 66b40e6f4e75fba076956028
           photo:
             description: "Link to contacts's photo"
             type: string
