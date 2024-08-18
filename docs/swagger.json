@@ -196,8 +196,7 @@
                 "required": [
                   "name",
                   "phoneNumber",
-                  "contactType",
-                  "userId"
+                  "contactType"
                 ],
                 "properties": {
                   "name": {
@@ -230,11 +229,6 @@
                       "personal"
                     ],
                     "default": "personal"
-                  },
-                  "userId": {
-                    "description": "Contact's user id",
-                    "type": "string",
-                    "example": "66b40e6f4e75fba076956028"
                   },
                   "photo": {
                     "description": "Link to contacts's photo",
@@ -401,11 +395,6 @@
                     ],
                     "default": "personal"
                   },
-                  "userId": {
-                    "description": "Contact's user id",
-                    "type": "string",
-                    "example": "66b40e6f4e75fba076956028"
-                  },
                   "photo": {
                     "description": "Link to contacts's photo",
                     "type": "string",
@@ -455,7 +444,7 @@
         "tags": [
           "Contacts"
         ],
-        "summary": "Delete by id",
+        "summary": "Delete contact by id",
         "operationId": "deleteContact",
         "description": "Delete contact by id",
         "security": [
